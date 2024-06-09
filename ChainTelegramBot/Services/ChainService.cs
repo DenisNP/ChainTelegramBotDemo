@@ -1,4 +1,5 @@
 ﻿using ChainTelegramBot.Abstract;
+using ChainTelegramBot.Handlers;
 using ChainTelegramBot.Models;
 using Telegram.Bot.Types;
 // ReSharper disable InvertIf
@@ -9,9 +10,9 @@ namespace ChainTelegramBot.Services;
 public class ChainService(IServiceProvider serviceProvider, IStateStorage stateStorage) : IChainService
 {
     private readonly Type[] _chain = [
-        // typeof(SomeHandler1),
-        // typeof(SomeHandler2)
-        // ...
+        typeof(EnterHandler),
+        typeof(GetLanguageHandler),
+        typeof(GetExpHandler)
     ];
 
     private async Task Handle(Context ctx)
