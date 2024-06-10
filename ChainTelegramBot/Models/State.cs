@@ -3,6 +3,5 @@
 public class State
 {
     public long UserId { get; set; }
-    public string Language { get; set; }
-    public int? Experience { get; set; }
+    public HashSet<int> VisitedPresentations { get; set; } = new();
 }

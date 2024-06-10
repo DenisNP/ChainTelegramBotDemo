@@ -2,17 +2,16 @@
 using ChainTelegramBot.Handlers;
 using ChainTelegramBot.Models;
 using Telegram.Bot.Types;
-// ReSharper disable InvertIf
-// ReSharper disable UnusedMember.Local
 
 namespace ChainTelegramBot.Services;
 
 public class ChainService(IServiceProvider serviceProvider, IStateStorage stateStorage) : IChainService
 {
     private readonly Type[] _chain = [
-        typeof(EnterHandler),
-        typeof(GetLanguageHandler),
-        typeof(GetExpHandler)
+        typeof(ShowMenuHandler),
+        typeof(ToggleVisitedHandler),
+        typeof(GetNextPresentation),
+        typeof(NoNextPresentation),
     ];
 
     private async Task Handle(Context ctx)
@@ -20,7 +19,7 @@ public class ChainService(IServiceProvider serviceProvider, IStateStorage stateS
         foreach (Type handlerType in _chain)
         {
             var handler = (BaseHandler)ActivatorUtilities.CreateInstance(serviceProvider, handlerType, ctx)!;
-            if (handler.Check())
+            if (await handler.Check())
             {
                 await handler.Handle();
                 break;
@@ -30,13 +29,13 @@ public class ChainService(IServiceProvider serviceProvider, IStateStorage stateS
 
     public async Task HandleUpdateAsync(Update update)
     {
-        if (update is not { Message.From: not null })
+        long? userId = update.GetUserId();
+        if (!userId.HasValue)
         {
             return;
         }
 
-        long userId = update.Message.From.Id;
-        State state = await stateStorage.GetStateFor(userId);
+        State state = await stateStorage.GetStateFor(userId.Value);
 
         var ctx = new Context(update, state);
         await Handle(ctx);

@@ -16,6 +16,6 @@ public abstract class BaseHandler
         Context = context;
     }
 
-    public abstract bool Check();
+    public abstract Task<bool> Check();
     public abstract Task Handle();
 }

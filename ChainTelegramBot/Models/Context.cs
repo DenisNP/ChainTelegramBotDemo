@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types;
+﻿using ChainTelegramBot.Abstract;
+using Telegram.Bot.Types;
 
 namespace ChainTelegramBot.Models;
 
@@ -7,12 +8,21 @@ public class Context
     public Update Update { get; }
     public State State { get; }
 
-    private int? _firstNumber;
-    public int? FirstNumber => _firstNumber ??= 
-        Update.Message is { Text.Length: > 0 } 
-        && int.TryParse(Update.Message.Text, out int n) 
-            ? n 
-            : null;
+    public bool ReceivedNext => Update.Message?.Text?.StartsWith("/next") == true;
+
+    private Presentation? _firstUnvisited;
+    public async Task<Presentation?> GetFirstUnvisited(IPresentationStorage presentationStorage)
+    {
+        if (_firstUnvisited == null)
+        {
+            var presentations = await presentationStorage.GetAvailablePresentations();
+            _firstUnvisited = presentations.FirstOrDefault(
+                p => p.Time >= DateTime.Now && !State.VisitedPresentations.Contains(p.Id)
+            );
+        }
+
+        return _firstUnvisited;
+    }
 
     public Context(Update update, State state)
     {
