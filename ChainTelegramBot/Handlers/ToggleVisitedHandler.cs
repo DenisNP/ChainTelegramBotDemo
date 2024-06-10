@@ -3,7 +3,6 @@ using ChainTelegramBot.Models;
 using ChainTelegramBot.Services;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace ChainTelegramBot.Handlers;
 
